@@ -1,33 +1,56 @@
+--Pdep Lunes mañana 2019 1C
 --Integrantes:
 --Mauro Corengia mauro_corengia@hotmail.com
 --Andrew Sosa andrew.wsosa@gmail.com
 
+--Cambios V1.1
+--1) Incorporacion  type alias
+
+--2)Sintaxis Ej Pasamos de 
+----deReversaRocha (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
+----    Auto nombre (nivelDeNafta +200) velocidad nombreEnamorade truco
+----	a
+--	--deReversaRocha unAuto = unAuto { nivelDeNafta = ((+200).nivelDeNafta) unAuto}
+
+--3)fingirAmor ahora recibe por parametro su enamorade
+
+--4)Incluimos Pattern Matching para esVocal
+
+--Cambios V1.2
+--Se incorpora la funcion modificarVelocidadAuto
+
 --3.1
+
+type Truco = Auto -> Auto
+
+
 data Auto = Auto {
     nombre :: String,
     nivelDeNafta :: Int,
     velocidad :: Int,
     nombreEnamorade :: String,
-    truco :: (Auto -> Auto)
+    truco :: Truco
 }
 
+modificarVelocidadAuto :: Int -> Truco
+modificarVelocidadAuto speed unAuto = unAuto { velocidad = ((+speed).velocidad) unAuto}
 
-deReversaRocha :: Auto -> Auto
-deReversaRocha (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    Auto nombre (nivelDeNafta +200) velocidad nombreEnamorade truco
 
-impresionar :: Auto -> Auto
-impresionar (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre nivelDeNafta (velocidad *2) nombreEnamorade truco)
+deReversaRocha :: Truco
+deReversaRocha  unAuto = unAuto { nivelDeNafta = ((+200).nivelDeNafta) unAuto}
 
-nitro :: Auto -> Auto
-nitro (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre nivelDeNafta (velocidad +15) nombreEnamorade truco)
 
-fingirAmor :: Auto -> Auto
-fingirAmor (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre nivelDeNafta velocidad "Petra" truco)
+impresionar :: Truco
+impresionar unAuto = unAuto { velocidad = (velocidad.modificarVelocidadAuto (velocidad unAuto) ) unAuto}
+--impresionar unAuto = unAuto { velocidad = ((*2).velocidad) unAuto}--Cambios V1.2
 
+nitro :: Truco
+nitro unAuto = unAuto { velocidad = (velocidad.modificarVelocidadAuto 15) unAuto}
+--nitro unAuto = unAuto { velocidad = ((+15).velocidad) unAuto}--Cambios V1.2
+
+fingirAmor :: String -> Truco
+fingirAmor nombreNueveEnamorade  unAuto =  
+    unAuto { nombreEnamorade = nombreNueveEnamorade}
 
 rochaMcQueen = Auto {
     nombre = "RochaMcQueen",
@@ -58,49 +81,57 @@ rodra = Auto {
     nivelDeNafta = 0,
     velocidad = 50,
     nombreEnamorade = "Taisa",
-    truco = fingirAmor
+    truco = fingirAmor "Petra"
 }
 
 --3.2
 
 esVocal :: Char -> Bool
-esVocal letra | letra == 'a' = True
-              | letra == 'e' = True
-              | letra == 'i' = True
-              | letra == 'o' = True
-              | letra == 'u' = True
-              | otherwise = False
+
+esVocal 'a' = True
+esVocal 'e' = True
+esVocal 'i' = True
+esVocal 'o' = True
+esVocal 'u' = True
+esVocal _ = False
+
 
 cantidadDeVocales :: String -> Int
-cantidadDeVocales nombreEnamorade = length (filter esVocal nombreEnamorade)
+cantidadDeVocales  = length.filter esVocal
 
-tamanioDelIncremento :: Int -> Int
-tamanioDelIncremento vocales | vocales > 4 = 30
+
+velocidadDelIncremento :: Int -> Int
+velocidadDelIncremento vocales | vocales > 4 = 30
                              | vocales >= 3 = 20
                              | vocales >= 1 = 15
                              | otherwise = 0
 
-incrementarVelocidad :: Auto -> Auto
-incrementarVelocidad (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre nivelDeNafta (velocidad + (tamanioDelIncremento.cantidadDeVocales$ nombreEnamorade)) nombreEnamorade truco)
 
+incrementarVelocidad :: Truco
+incrementarVelocidad unAuto =  
+    unAuto {velocidad= (velocidad.modificarVelocidadAuto (velocidadDelIncremento.cantidadDeVocales$ nombreEnamorade unAuto) ) unAuto }
+--unAuto {velocidad= (velocidad unAuto + (velocidadDelIncremento.cantidadDeVocales$ nombreEnamorade unAuto))}--Cambios V1.2
 
 --3.3
 
 puedeRealizarTruco :: Auto -> Bool
-puedeRealizarTruco auto = nivelDeNafta auto > 0 && velocidad auto < 100
+puedeRealizarTruco auto = ((>0).nivelDeNafta) auto && ((<100).velocidad) auto 
+--puedeRealizarTruco auto = nivelDeNafta auto > 0 && velocidad auto < 100
+
+
 
 --3.4
 
-comboLoco :: Auto -> Auto
+comboLoco :: Truco
 comboLoco = deReversaRocha.nitro
 
-queTrucazo :: Auto -> Auto
-queTrucazo = incrementarVelocidad.fingirAmor
+queTrucazo :: String -> Truco
+queTrucazo nombreNueveEnamorade unAuto= (incrementarVelocidad.fingirAmor nombreNueveEnamorade) unAuto
 
-turbo :: Auto -> Auto
-turbo (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre 0 (velocidad + nivelDeNafta*10) nombreEnamorade truco)
+turbo :: Truco
+turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = (velocidad.modificarVelocidadAuto ((*10).nivelDeNafta$ unAuto) ) unAuto}
+--turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = velocidad unAuto + ((*10).nivelDeNafta) unAuto}--Cambios V1.2
+
 
 -----
 --------------------------------
@@ -115,14 +146,14 @@ turbo (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =
 --Poner el texto en la consola para realizar los casos de pruebas
 
 informacionAuto :: Auto -> String
-informacionAuto auto = "El auto " ++ nombre auto  ++ " tiene "  ++ show (nivelDeNafta auto) ++ " litros, su velocidad es " ++ show (velocidad auto) ++ " y su enamorado es " ++ nombreEnamorade auto
+informacionAuto auto = "El auto " ++ nombre auto  ++ " tiene "  ++ show (nivelDeNafta auto) ++ " litros, su velocidad es " ++ show (velocidad auto) ++ " y su enamorade es " ++ nombreEnamorade auto
 
 
 --3.1
 --(informacionAuto.deReversaRocha) rochaMcQueen
 --(informacionAuto.impresionar) biankerr
 --(informacionAuto.nitro) gushtav
---(informacionAuto.fingirAmor) rodra
+--(informacionAuto.truco rodra) rodra
 
 
 --3.2
@@ -138,14 +169,6 @@ informacionAuto auto = "El auto " ++ nombre auto  ++ " tiene "  ++ show (nivelDe
 
 --3.4
 --(informacionAuto.comboLoco) rochaMcQueen
-
---(informacionAuto.queTrucazo2) rodra
-queTrucazo2 :: Auto -> Auto
-queTrucazo2 = incrementarVelocidad.fingirAmor2
-
-fingirAmor2 :: Auto -> Auto
-fingirAmor2 (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-    (Auto nombre nivelDeNafta velocidad "Murcielago" truco)
-
+--(informacionAuto.queTrucazo "Murcielago") rodra
 --(informacionAuto.turbo) gushtav
 --(informacionAuto.turbo) rodra
