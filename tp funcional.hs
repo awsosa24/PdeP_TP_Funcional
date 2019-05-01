@@ -3,54 +3,102 @@
 --Mauro Corengia mauro_corengia@hotmail.com
 --Andrew Sosa andrew.wsosa@gmail.com
 
---Cambios V1.1
---1) Incorporacion  type alias
+--Cambios V2
 
---2)Sintaxis Ej Pasamos de 
-----deReversaRocha (Auto nombre nivelDeNafta velocidad nombreEnamorade truco) =  
-----    Auto nombre (nivelDeNafta +200) velocidad nombreEnamorade truco
-----	a
---	--deReversaRocha unAuto = unAuto { nivelDeNafta = ((+200).nivelDeNafta) unAuto}
-
---3)fingirAmor ahora recibe por parametro su enamorade
-
---4)Incluimos Pattern Matching para esVocal
-
---Cambios V1.2
---Se incorpora la funcion modificarVelocidadAuto
-
---3.1
-
+--Definicion de tipos
 type Truco = Auto -> Auto
+
+type CantidadVueltas = Int
+type LongitudVuelta = Float
+type IntegrantesPublico = [String]
+type Trampa = Carrera -> Carrera
+type Participantes = [Auto]
+
+type NivelDeNafta = Int
 
 
 data Auto = Auto {
     nombre :: String,
-    nivelDeNafta :: Int,
+    nivelDeNafta :: NivelDeNafta,
     velocidad :: Int,
     nombreEnamorade :: String,
     truco :: Truco
 }
 
-modificarVelocidadAuto :: Int -> Truco
-modificarVelocidadAuto speed unAuto = unAuto { velocidad = ((+speed).velocidad) unAuto}
+--V2.0 Punto 3.1
+data Carrera = Carrera {
+    cantidadVueltas :: CantidadVueltas,
+    longitudVuelta :: LongitudVuelta,
+    integrantesPublico :: IntegrantesPublico,
+    trampa :: Trampa,
+    participantes :: Participantes
+}
+--V2.0 Punto 3.1
+potreroFunes = Carrera {
+    cantidadVueltas = 3,
+    longitudVuelta = 5.0,
+    integrantesPublico = ["Ronco", "Tinch", "Dodain"],
+    trampa = sacarAlPistero,
+    participantes = [rochaMcQueen, biankerr, gushtav, rodra] 
+} 
 
+--Modelado de trampas --V2.0 Punto 3.1
+sacarAlPistero :: Trampa
+sacarAlPistero unaCarrera = unaCarrera {participantes = (primerParticipanteDescalificado.participantes) unaCarrera}
+
+primerParticipanteDescalificado :: Participantes -> Participantes
+primerParticipanteDescalificado participantes = tail participantes  
+--Para probar este punto usar informacionCarrera.sacarAlPistero$ potreroFunes 
+
+
+lluvia :: Trampa
+lluvia unaCarrera = unaCarrera {participantes = (map (modificarVelocidadAuto 10).participantes) unaCarrera}
+--tambien se puede escribir asi {participantes = map (modificarVelocidadAuto 10) (participantes unaCarrera)}
+
+neutralizarTrucos :: Trampa
+neutralizarTrucos unaCarrera = unaCarrera {participantes = (map (modificarTrucoAuto inutilidad).participantes) unaCarrera}
+
+modificarTrucoAuto :: Truco -> Auto -> Auto
+modificarTrucoAuto nuevoTruco unAuto = unAuto {truco = nuevoTruco}
+
+inutilidad :: Truco
+inutilidad unAuto = unAuto
+
+--pocaReserva
+pocaReserva :: Trampa
+pocaReserva unaCarrera = unaCarrera {participantes = (pocoNivelNafta.participantes)unaCarrera}
+
+pocoNivelNafta :: [Auto] -> [Auto]
+pocoNivelNafta  = filter ((< 30).nivelDeNafta)
+
+--naftaMenorA30 :: [NivelDeNafta] -> [NivelDeNafta]
+--naftaMenorA30= filter (>30) 
+
+--podio
+podio :: Trampa
+podio unaCarrera = unaCarrera {participantes = (primeros3Participantes.participantes) unaCarrera}
+
+primeros3Participantes :: Participantes -> Participantes
+primeros3Participantes (x:xs) = take 3 xs  
+
+--Trucos V1.x
+modificarVelocidadAuto :: Int -> Auto -> Auto
+modificarVelocidadAuto speed unAuto = unAuto { velocidad = ((+speed).velocidad) unAuto}
 
 deReversaRocha :: Truco
 deReversaRocha  unAuto = unAuto { nivelDeNafta = ((+200).nivelDeNafta) unAuto}
 
+deReversa :: Truco
+deReversa  unAuto = unAuto { nivelDeNafta = ((div 5).velocidad) unAuto} --V2.0 Punto 3.0
 
 impresionar :: Truco
 impresionar unAuto = unAuto { velocidad = (velocidad.modificarVelocidadAuto (velocidad unAuto) ) unAuto}
---impresionar unAuto = unAuto { velocidad = ((*2).velocidad) unAuto}--Cambios V1.2
 
 nitro :: Truco
 nitro unAuto = unAuto { velocidad = (velocidad.modificarVelocidadAuto 15) unAuto}
---nitro unAuto = unAuto { velocidad = ((+15).velocidad) unAuto}--Cambios V1.2
 
 fingirAmor :: String -> Truco
-fingirAmor nombreNueveEnamorade  unAuto =  
-    unAuto { nombreEnamorade = nombreNueveEnamorade}
+fingirAmor nombreNueveEnamorade  unAuto =   unAuto { nombreEnamorade = nombreNueveEnamorade}
 
 rochaMcQueen = Auto {
     nombre = "RochaMcQueen",
@@ -133,6 +181,14 @@ turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = (velocidad.modificarVeloci
 --turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = velocidad unAuto + ((*10).nivelDeNafta) unAuto}--Cambios V1.2
 
 
+----------------------------------------------------------------------------------------------------------
+-----------
+----------------------------------------------------------------------------------------------------------
+--Entrega 2
+
+
+
+
 -----
 --------------------------------
 -----------------------------------------------
@@ -147,6 +203,11 @@ turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = (velocidad.modificarVeloci
 
 informacionAuto :: Auto -> String
 informacionAuto auto = "El auto " ++ nombre auto  ++ " tiene "  ++ show (nivelDeNafta auto) ++ " litros, su velocidad es " ++ show (velocidad auto) ++ " y su enamorade es " ++ nombreEnamorade auto
+
+informacionCarrera :: Carrera -> String
+--informacionCarrera carrera = " y sus competidores son " ++ show (map nombre (participantes carrera))
+informacionCarrera carrera = "La carrera "  ++ " tiene "  ++ show (cantidadVueltas carrera) ++ " vueltas, su longitud es " ++ show (longitudVuelta carrera) ++ ",sus participantes son" ++ show (integrantesPublico carrera)++" y sus competidores son " ++ show (map nombre (participantes carrera))
+
 
 
 --3.1
