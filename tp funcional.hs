@@ -7,13 +7,6 @@
 
 --Definicion de tipos
 type Truco = Auto -> Auto
-
-type CantidadVueltas = Int
-type LongitudVuelta = Float
-type IntegrantesPublico = [String]
-type Trampa = Carrera -> Carrera
-type Participantes = [Auto]
-
 type NivelDeNafta = Int
 
 
@@ -24,62 +17,6 @@ data Auto = Auto {
     nombreEnamorade :: String,
     truco :: Truco
 }
-
---V2.0 Punto 3.1
-data Carrera = Carrera {
-    cantidadVueltas :: CantidadVueltas,
-    longitudVuelta :: LongitudVuelta,
-    integrantesPublico :: IntegrantesPublico,
-    trampa :: Trampa,
-    participantes :: Participantes
-}
---V2.0 Punto 3.1
-potreroFunes = Carrera {
-    cantidadVueltas = 3,
-    longitudVuelta = 5.0,
-    integrantesPublico = ["Ronco", "Tinch", "Dodain"],
-    trampa = sacarAlPistero,
-    participantes = [rochaMcQueen, biankerr, gushtav, rodra] 
-} 
-
---Modelado de trampas --V2.0 Punto 3.1
-sacarAlPistero :: Trampa
-sacarAlPistero unaCarrera = unaCarrera {participantes = (primerParticipanteDescalificado.participantes) unaCarrera}
-
-primerParticipanteDescalificado :: Participantes -> Participantes
-primerParticipanteDescalificado participantes = tail participantes  
---Para probar este punto usar informacionCarrera.sacarAlPistero$ potreroFunes 
-
-
-lluvia :: Trampa
-lluvia unaCarrera = unaCarrera {participantes = (map (modificarVelocidadAuto 10).participantes) unaCarrera}
---tambien se puede escribir asi {participantes = map (modificarVelocidadAuto 10) (participantes unaCarrera)}
-
-neutralizarTrucos :: Trampa
-neutralizarTrucos unaCarrera = unaCarrera {participantes = (map (modificarTrucoAuto inutilidad).participantes) unaCarrera}
-
-modificarTrucoAuto :: Truco -> Auto -> Auto
-modificarTrucoAuto nuevoTruco unAuto = unAuto {truco = nuevoTruco}
-
-inutilidad :: Truco
-inutilidad unAuto = unAuto
-
---pocaReserva
-pocaReserva :: Trampa
-pocaReserva unaCarrera = unaCarrera {participantes = (pocoNivelNafta.participantes)unaCarrera}
-
-pocoNivelNafta :: [Auto] -> [Auto]
-pocoNivelNafta  = filter ((< 30).nivelDeNafta)
-
---naftaMenorA30 :: [NivelDeNafta] -> [NivelDeNafta]
---naftaMenorA30= filter (>30) 
-
---podio
-podio :: Trampa
-podio unaCarrera = unaCarrera {participantes = (primeros3Participantes.participantes) unaCarrera}
-
-primeros3Participantes :: Participantes -> Participantes
-primeros3Participantes (x:xs) = take 3 xs  
 
 --Trucos V1.x
 modificarVelocidadAuto :: Int -> Auto -> Auto
@@ -181,11 +118,106 @@ turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = (velocidad.modificarVeloci
 --turbo unAuto = unAuto {nivelDeNafta = 0} {velocidad = velocidad unAuto + ((*10).nivelDeNafta) unAuto}--Cambios V1.2
 
 
-----------------------------------------------------------------------------------------------------------
------------
-----------------------------------------------------------------------------------------------------------
---Entrega 2
+------- Entrega 2 --------
+type CantidadVueltas = Int
+type LongitudVuelta = Int 
+type IntegrantesPublico = [String]
+type Participantes = [Auto]
+type Trampa = Participantes -> Participantes
 
+------------ 3.1 ---------------
+--V2.0 Punto 3.1
+data Carrera = Carrera {
+    cantidadVueltas :: CantidadVueltas,
+    longitudVuelta :: LongitudVuelta,
+    integrantesPublico :: IntegrantesPublico,
+    trampa :: Trampa,
+    participantes :: Participantes
+}
+
+--V2.0 Punto 3.1
+potreroFunes = Carrera {
+    cantidadVueltas = 3,
+    longitudVuelta = 5,
+    integrantesPublico = ["Ronco", "Tinch", "Dodain"],
+    trampa = sacarAlPistero,
+    participantes = [rochaMcQueen, biankerr, gushtav, rodra] 
+} 
+
+-------------- 3.2 ---------------
+--Funciones aux para tramptype Participantes = [Auto]as
+inutilidad :: Truco
+inutilidad unAuto = unAuto
+
+modificarTrucoAuto :: Truco -> Auto -> Auto
+modificarTrucoAuto nuevoTruco unAuto = unAuto {truco = nuevoTruco}
+
+
+--Modelado de trampas --V2.0 Punto 3.1
+sacarAlPistero :: Trampa
+sacarAlPistero = tail
+
+lluvia :: Trampa
+lluvia = map (modificarVelocidadAuto (-10))
+
+neutralizarTrucos :: Trampa
+neutralizarTrucos = map (modificarTrucoAuto inutilidad)
+
+--pocaReserva
+pocaReserva :: Trampa
+pocaReserva = filter ((< 30).nivelDeNafta)
+
+--podio
+podio :: Trampa
+podio (x:xs) = take 3 xs
+
+
+--------------- 3.3 -----------------
+aplicarAParticipantes :: (Auto -> Auto) -> Carrera -> Carrera
+aplicarAParticipantes modificador unaCarrera = unaCarrera {participantes = map modificador (participantes unaCarrera)}
+
+restarCombustible :: Carrera -> Auto -> Auto
+restarCombustible unaCarrera unAuto = unAuto {nivelDeNafta = nivelDeNafta unAuto - div (longitudVuelta unaCarrera) ((*10).velocidad$ unAuto)}
+
+realizarTruco :: Auto -> Auto
+realizarTruco unAuto = (truco unAuto) unAuto
+
+aplicarTrampa :: Carrera -> Carrera
+aplicarTrampa unaCarrera = unaCarrera {participantes = (trampa unaCarrera) (participantes unaCarrera)}
+
+
+darVuelta :: Carrera -> Carrera
+darVuelta unaCarrera = (aplicarTrampa).(aplicarAParticipantes realizarTruco).(aplicarAParticipantes (restarCombustible unaCarrera))$ unaCarrera
+
+restarVuelta :: Carrera -> Carrera
+restarVuelta unaCarrera = unaCarrera {cantidadVueltas = cantidadVueltas unaCarrera - 1}
+
+correrCarrera :: Carrera -> Carrera
+correrCarrera unaCarrera | cantidadVueltas unaCarrera > 0 = darVuelta (restarVuelta.darVuelta$ unaCarrera)
+                         | otherwise = unaCarrera
+
+
+----------- 3.4 ------------
+--mayorVelocidad :: [Auto] -> Auto
+
+
+--quienGana :: Carrera -> Auto
+--quienGana unaCarrera = mayorVelocidad (participantes unaCarrera)
+
+
+------------ 3.5 ------------
+--elGranTruco :: [Truco] -> Auto -> Auto
+--elGranTruco trucos unAuto = map unAuto trucos
+
+-- Hay un ejercicio casi igual en mumuki
+
+------------ 3.6 --------------
+
+
+
+
+--naftaMenorA30 :: [NivelDeNafta] -> [NivelDeNafta]
+--naftaMenorA30= filter (>30) 
 
 
 
@@ -233,3 +265,8 @@ informacionCarrera carrera = "La carrera "  ++ " tiene "  ++ show (cantidadVuelt
 --(informacionAuto.queTrucazo "Murcielago") rodra
 --(informacionAuto.turbo) gushtav
 --(informacionAuto.turbo) rodra
+
+--Cambios
+--reordenar segun la entrega
+--cambiar el tipo de las trampas a participantes -> participantes
+--cambio de longitud de vuelta de float a int 
