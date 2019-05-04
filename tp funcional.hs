@@ -198,12 +198,19 @@ correrCarrera unaCarrera | cantidadVueltas unaCarrera > 0 = darVuelta (restarVue
 
 
 ----------- 3.4 ------------
---mayorVelocidad :: [Auto] -> Auto
+--mayorVelocidad :: [Auto] -> [Auto]
+mayorVelocidad :: Participantes -> Auto
+mayorVelocidad unosAutos = (head.buscarAutosMasVeloces) unosAutos
 
+--No es trivial el uso del plural, si varios Autos tienen la misma velocidad, devuelve el primero de la lista
+buscarAutosMasVeloces :: Participantes -> Participantes
+buscarAutosMasVeloces unosAutos = filter ((==(buscarMaxVelocidad unosAutos)).velocidad ) unosAutos
 
---quienGana :: Carrera -> Auto
---quienGana unaCarrera = mayorVelocidad (participantes unaCarrera)
+buscarMaxVelocidad :: Participantes -> Int
+buscarMaxVelocidad unosAutos = foldl1 (max) (map velocidad unosAutos)
 
+--Para probarlo
+--informacionAuto.mayorVelocidad$ [rodra,biankerr,rochaMcQueen] 
 
 ------------ 3.5 ------------
 --elGranTruco :: [Truco] -> Auto -> Auto
