@@ -213,10 +213,9 @@ buscarMaxVelocidad unosAutos = foldl1 (max) (map velocidad unosAutos)
 --informacionAuto.mayorVelocidad$ [rodra,biankerr,rochaMcQueen] 
 
 ------------ 3.5 ------------
---elGranTruco :: [Truco] -> Auto -> Auto
---elGranTruco trucos unAuto = map unAuto trucos
-
--- Hay un ejercicio casi igual en mumuki
+elGranTruco :: [Truco] -> Auto -> Auto
+elGranTruco [] unAuto = unAuto
+elGranTruco (x:xs) unAuto = elGranTruco xs (x unAuto)
 
 ------------ 3.6 --------------
 
