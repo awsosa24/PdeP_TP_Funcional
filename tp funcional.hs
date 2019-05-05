@@ -218,12 +218,13 @@ elGranTruco [] unAuto = unAuto
 elGranTruco (x:xs) unAuto = elGranTruco xs (x unAuto)
 
 ------------ 3.6 --------------
+--1) No, no podremos correrla porque esto implicaria restarle nafta, realizar trucos, entre otros a una lista infinita. El concepto de lazy evaluation no nos serviria.
 
+--2)Si, podremos correrla. Al tener lazy evaluation, no tenemos que evaluar la lista infinita para ver el primer participante, es decir, al hacer head. de una lista infinita, solo evaluaremos el primer termino
 
+--3)Si, podremos. Todavia no hay necesidad de calcular la lista infinita al usar la funcion restarVuelta
+---
 
-
---naftaMenorA30 :: [NivelDeNafta] -> [NivelDeNafta]
---naftaMenorA30= filter (>30) 
 
 
 
