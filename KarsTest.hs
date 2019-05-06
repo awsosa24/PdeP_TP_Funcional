@@ -14,6 +14,7 @@ main = hspec $ do
     it "3.0" $ do
        (nivelDeNafta.truco rochaMcQueen) rochaMcQueen `shouldBe` (500 :: Int)
        (nivelDeNafta.impresionar) rodra `shouldBe` (0 :: Int)
+
     it "3.2" $ do 
      (length.sacarAlPistero.participantes) potreroFunes `shouldBe` (3 :: Int)
 --ESTA FALTANDO ESTE TEST (map nombre.pocaReserva.sacarAlPistero) (participantes potreroFunes) `shouldBe` (["Biankerr", "Gushtav", "Rodra"] :: [String])	 
@@ -22,3 +23,19 @@ main = hspec $ do
      (length.podio.participantes) potreroFunes `shouldBe` (3 :: Int)
      (velocidad.last.lluvia.participantes) potreroFunes `shouldBe` (40 :: Int)
 
+    it "3.3" $ do
+ --ESTA FALTANDO ESTE TEST (nivelDeNafta.head.participantes.darVuelta) potreroFunes `shouldBe` (490 :: Int)
+     --(nivelDeNafta.head.participantes.darVuelta) potreroFunes `shouldBe` (40 :: Int)
+     (length.participantes.darVuelta.darVuelta) potreroFunes `shouldBe` (2 :: Int)
+ --ESTA FALTANDO ESTE TEST (nivelDeNafta.head.participantes.darVuelta.darVuelta) potreroFunes `shouldBe` (70 :: Int)
+ --ESTA FALTANDO ESTE TEST ((==1).length.participantes.correrCarrera) potreroFunes `shouldBe` (True :: Bool)
+
+    it "3.5" $ do
+     (velocidad.(elGranTruco [nitro,deReversa,impresionar])) rodra `shouldBe` (130 :: Int)
+ --ESTA FALTANDO ESTE TEST (nivelDeNafta.(elGranTruco [nitro,deReversa,impresionar])) rodra `shouldBe` (13 :: Int)
+
+
+
+     
+
+     

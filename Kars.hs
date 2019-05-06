@@ -105,7 +105,6 @@ puedeRealizarTruco auto = ((>0).nivelDeNafta) auto && ((<100).velocidad) auto
 --puedeRealizarTruco auto = nivelDeNafta auto > 0 && velocidad auto < 100
 
 
-
 --3.4
 
 comboLoco :: Truco
@@ -181,7 +180,8 @@ restarCombustible :: Carrera -> Auto -> Auto
 restarCombustible unaCarrera unAuto = unAuto {nivelDeNafta = nivelDeNafta unAuto - div (longitudVuelta unaCarrera) ((*10).velocidad$ unAuto)}
 
 realizarTruco :: Auto -> Auto
-realizarTruco unAuto = (truco unAuto) unAuto
+realizarTruco unAuto | puedeRealizarTruco unAuto = (truco unAuto) unAuto
+                     | otherwise = unAuto
 
 aplicarTrampa :: Carrera -> Carrera
 aplicarTrampa unaCarrera = unaCarrera {participantes = (trampa unaCarrera) (participantes unaCarrera)}
@@ -279,3 +279,4 @@ informacionCarrera carrera = "La carrera "  ++ " tiene "  ++ show (cantidadVuelt
 --reordenar segun la entrega
 --cambiar el tipo de las trampas a participantes -> participantes
 --cambio de longitud de vuelta de float a int 
+
